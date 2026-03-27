@@ -1,0 +1,1790 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TemplateForge</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --ink: #0f0f13;
+        --ink2: #1a1a22;
+        --ink3: #252530;
+        --line: #2e2e3e;
+        --line2: #3a3a50;
+        --smoke: #8888a0;
+        --fog: #c0c0d0;
+        --white: #ffffff;
+        --lime: #c6f135;
+        --lime-dark: #a8d020;
+        --red: #ff4d6d;
+        --blue: #4d9fff;
+        --amber: #ffb020;
+        --mono: "DM Mono", monospace;
+        --sans: "Plus Jakarta Sans", sans-serif;
+      }
+
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
+      }
+      body {
+        background: var(--ink);
+        color: var(--white);
+        font-family: var(--sans);
+      }
+
+      /* GATE */
+      #loginGate {
+        position: fixed;
+        inset: 0;
+        background: var(--ink);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
+      .gate-card {
+        background: var(--ink2);
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        padding: 44px 40px;
+        width: 400px;
+        position: relative;
+        overflow: hidden;
+      }
+      .gate-card::before {
+        content: "";
+        position: absolute;
+        top: -80px;
+        right: -80px;
+        width: 220px;
+        height: 220px;
+        background: radial-gradient(circle, rgba(198, 241, 53, 0.1) 0%, transparent 70%);
+        pointer-events: none;
+      }
+      .gate-logo {
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        margin-bottom: 6px;
+      }
+      .gate-logo .dot {
+        color: var(--lime);
+      }
+      .gate-sub {
+        font-size: 13px;
+        color: var(--smoke);
+        margin-bottom: 32px;
+      }
+      .gate-heading {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--fog);
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        margin-bottom: 10px;
+      }
+      .gate-options {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .gate-btn {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 18px;
+        border: 1.5px solid var(--line);
+        border-radius: 12px;
+        background: var(--ink3);
+        color: var(--white);
+        font-family: var(--sans);
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: left;
+      }
+      .gate-btn:hover {
+        transform: translateX(4px);
+      }
+      .gate-btn.dev:hover {
+        border-color: var(--lime);
+      }
+      .gate-btn.content:hover {
+        border-color: var(--blue);
+      }
+      .gate-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        flex-shrink: 0;
+      }
+      .gate-btn.dev .gate-icon {
+        background: rgba(198, 241, 53, 0.12);
+      }
+      .gate-btn.content .gate-icon {
+        background: rgba(77, 159, 255, 0.12);
+      }
+      .gate-btn-desc {
+        font-size: 11px;
+        color: var(--smoke);
+        font-weight: 400;
+        margin-top: 2px;
+      }
+      #passForm {
+        display: none;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 8px;
+      }
+      .gate-pass {
+        background: var(--ink3);
+        border: 1.5px solid var(--line);
+        border-radius: 9px;
+        color: var(--white);
+        font-family: var(--mono);
+        font-size: 13px;
+        padding: 11px 14px;
+        outline: none;
+        transition: border-color 0.2s;
+        width: 100%;
+      }
+      .gate-pass:focus {
+        border-color: var(--blue);
+      }
+      .gate-pass::placeholder {
+        color: var(--smoke);
+      }
+      #passError {
+        font-size: 12px;
+        color: var(--red);
+        display: none;
+      }
+
+      /* APP */
+      #app {
+        display: none;
+        height: 100vh;
+        flex-direction: column;
+      }
+      #app.visible {
+        display: flex;
+      }
+
+      /* TOPBAR */
+      .topbar {
+        height: 54px;
+        background: var(--ink2);
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        padding: 0 20px;
+        gap: 14px;
+        flex-shrink: 0;
+      }
+      .app-logo {
+        font-size: 16px;
+        font-weight: 800;
+        letter-spacing: -0.3px;
+      }
+      .app-logo .dot {
+        color: var(--lime);
+      }
+      .tbadge {
+        font-size: 11px;
+        padding: 3px 10px;
+        border-radius: 100px;
+        font-weight: 600;
+        font-family: var(--mono);
+      }
+      .tbadge.dev {
+        background: rgba(198, 241, 53, 0.12);
+        color: var(--lime);
+        border: 1px solid rgba(198, 241, 53, 0.25);
+      }
+      .tbadge.content {
+        background: rgba(77, 159, 255, 0.12);
+        color: var(--blue);
+        border: 1px solid rgba(77, 159, 255, 0.25);
+      }
+      .topbar-right {
+        margin-left: auto;
+        display: flex;
+        gap: 8px;
+      }
+      .tbtn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--ink3);
+        color: var(--fog);
+        font-family: var(--sans);
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .tbtn:hover {
+        border-color: var(--line2);
+        color: var(--white);
+      }
+      .tbtn.lime {
+        background: var(--lime);
+        color: var(--ink);
+        border-color: var(--lime);
+      }
+      .tbtn.lime:hover {
+        background: var(--lime-dark);
+      }
+
+      /* DEV LAYOUT */
+      #devView {
+        display: none;
+        flex: 1;
+        overflow: hidden;
+      }
+      #devView.visible {
+        display: grid;
+        grid-template-columns: 280px 1fr 360px;
+      }
+
+      .sidebar {
+        background: var(--ink2);
+        border-right: 1px solid var(--line);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .sb-head {
+        padding: 14px 16px 10px;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .sb-title {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: var(--smoke);
+        font-weight: 700;
+      }
+      .icon-btn {
+        width: 26px;
+        height: 26px;
+        border-radius: 6px;
+        border: 1px solid var(--line);
+        background: var(--ink3);
+        color: var(--fog);
+        font-size: 16px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s;
+      }
+      .icon-btn:hover {
+        border-color: var(--lime);
+        color: var(--lime);
+      }
+      .sb-list {
+        flex: 1;
+        overflow-y: auto;
+        padding: 8px;
+      }
+      .sb-list::-webkit-scrollbar {
+        width: 3px;
+      }
+      .sb-list::-webkit-scrollbar-thumb {
+        background: var(--line);
+      }
+      .tpl-item {
+        padding: 10px 11px;
+        border-radius: 9px;
+        cursor: pointer;
+        transition: all 0.15s;
+        border: 1.5px solid transparent;
+        margin-bottom: 3px;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+      }
+      .tpl-item:hover {
+        background: var(--ink3);
+      }
+      .tpl-item.active {
+        background: var(--ink3);
+        border-color: var(--lime);
+      }
+      .tpl-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 7px;
+        background: var(--ink);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        flex-shrink: 0;
+      }
+      .tpl-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .tpl-name {
+        font-size: 13px;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .tpl-meta {
+        font-size: 10px;
+        color: var(--smoke);
+        font-family: var(--mono);
+        margin-top: 1px;
+      }
+      .tpl-acts {
+        display: flex;
+        gap: 3px;
+        opacity: 0;
+        transition: opacity 0.15s;
+      }
+      .tpl-item:hover .tpl-acts {
+        opacity: 1;
+      }
+      .mini-btn {
+        width: 22px;
+        height: 22px;
+        border-radius: 5px;
+        border: none;
+        background: var(--ink2);
+        color: var(--smoke);
+        font-size: 11px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s;
+      }
+      .mini-btn.del:hover {
+        background: var(--red);
+        color: #fff;
+      }
+      .mini-btn.shr:hover {
+        background: var(--blue);
+        color: #fff;
+      }
+      .sb-empty {
+        text-align: center;
+        padding: 30px 12px;
+        color: var(--smoke);
+        font-size: 12px;
+        line-height: 1.6;
+      }
+
+      /* EDITOR */
+      .editor-pane {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        border-right: 1px solid var(--line);
+      }
+      .ptabs {
+        display: flex;
+        border-bottom: 1px solid var(--line);
+        background: var(--ink2);
+        flex-shrink: 0;
+      }
+      .ptab {
+        padding: 11px 18px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--smoke);
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        transition: all 0.15s;
+        background: none;
+        border-top: none;
+        border-left: none;
+        border-right: none;
+        font-family: var(--sans);
+      }
+      .ptab:hover {
+        color: var(--fog);
+      }
+      .ptab.active {
+        color: var(--lime);
+        border-bottom-color: var(--lime);
+      }
+      .pane-body {
+        flex: 1;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .html-wrap {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 14px;
+        gap: 10px;
+        overflow-y: auto;
+      }
+      .code-hint {
+        background: var(--ink3);
+        border: 1px solid var(--line);
+        border-left: 3px solid var(--lime);
+        border-radius: 7px;
+        padding: 10px 13px;
+        font-size: 11.5px;
+        color: var(--smoke);
+        line-height: 1.6;
+        flex-shrink: 0;
+      }
+      .code-hint code {
+        font-family: var(--mono);
+        color: var(--lime);
+      }
+      .tpl-ta {
+        flex: 1;
+        min-height: 260px;
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        color: #e0e0f0;
+        font-family: var(--mono);
+        font-size: 12.5px;
+        line-height: 1.8;
+        padding: 14px;
+        resize: none;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+      .tpl-ta:focus {
+        border-color: var(--lime);
+      }
+
+      .fields-wrap {
+        flex: 1;
+        padding: 14px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .fields-wrap::-webkit-scrollbar {
+        width: 3px;
+      }
+      .fields-wrap::-webkit-scrollbar-thumb {
+        background: var(--line);
+      }
+      .fcrow {
+        background: var(--ink3);
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        overflow: hidden;
+      }
+      .fcrow-head {
+        padding: 9px 13px;
+        background: var(--ink2);
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        gap: 9px;
+      }
+      .fcrow-key {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--lime);
+      }
+      .fc-type-sel {
+        margin-left: auto;
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        color: var(--fog);
+        font-family: var(--sans);
+        font-size: 11px;
+        padding: 3px 7px;
+        outline: none;
+        cursor: pointer;
+      }
+      .fcrow-body {
+        padding: 10px 13px;
+        display: flex;
+        gap: 9px;
+        align-items: center;
+      }
+      .fc-lbl-input {
+        flex: 1;
+        background: var(--ink2);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        color: var(--white);
+        font-family: var(--sans);
+        font-size: 12.5px;
+        padding: 7px 10px;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+      .fc-lbl-input:focus {
+        border-color: var(--blue);
+      }
+      .fc-lbl-input::placeholder {
+        color: var(--smoke);
+      }
+      .fc-req {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 11.5px;
+        color: var(--smoke);
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .fc-req input {
+        accent-color: var(--lime);
+      }
+      .fields-empty {
+        text-align: center;
+        padding: 30px;
+        color: var(--smoke);
+        font-size: 12px;
+        line-height: 1.6;
+      }
+
+      .save-bar {
+        padding: 11px 14px;
+        border-top: 1px solid var(--line);
+        background: var(--ink2);
+        display: flex;
+        gap: 8px;
+        flex-shrink: 0;
+      }
+      .save-input {
+        flex: 1;
+        background: var(--ink3);
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        color: var(--white);
+        font-family: var(--sans);
+        font-size: 13px;
+        padding: 8px 12px;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+      .save-input:focus {
+        border-color: var(--lime);
+      }
+      .save-input::placeholder {
+        color: var(--smoke);
+      }
+
+      /* PREVIEW */
+      .preview-pane {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .prev-head {
+        padding: 11px 16px;
+        border-bottom: 1px solid var(--line);
+        background: var(--ink2);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+      }
+      .prev-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: var(--smoke);
+        font-weight: 700;
+      }
+      .prev-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .prev-frame {
+        background: #fff;
+        border-radius: 9px;
+        border: 1px solid var(--line);
+        overflow: hidden;
+        min-height: 120px;
+      }
+      .prev-bar {
+        background: #e8e8ec;
+        padding: 7px 12px;
+        display: flex;
+        gap: 5px;
+        align-items: center;
+      }
+      .wdot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+      }
+      .wdot:nth-child(1) {
+        background: #ff5f57;
+      }
+      .wdot:nth-child(2) {
+        background: #febc2e;
+      }
+      .wdot:nth-child(3) {
+        background: #28c840;
+      }
+      .prev-inner {
+        padding: 18px;
+        font-family: sans-serif;
+        font-size: 14px;
+      }
+      .chip {
+        display: inline-block;
+        background: rgba(255, 176, 32, 0.13);
+        border: 1px dashed rgba(255, 176, 32, 0.45);
+        color: var(--amber);
+        padding: 0 5px;
+        border-radius: 4px;
+        font-family: var(--mono);
+        font-size: 11px;
+      }
+      .fields-detected {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+      }
+      .fchip {
+        font-size: 11px;
+        padding: 3px 9px;
+        border-radius: 100px;
+        font-family: var(--mono);
+      }
+      .fchip.text {
+        background: rgba(198, 241, 53, 0.1);
+        color: var(--lime);
+        border: 1px solid rgba(198, 241, 53, 0.25);
+      }
+      .fchip.img {
+        background: rgba(77, 159, 255, 0.1);
+        color: var(--blue);
+        border: 1px solid rgba(77, 159, 255, 0.25);
+      }
+
+      /* CONTENT VIEW */
+      #contentView {
+        display: none;
+        flex: 1;
+        overflow: hidden;
+        align-items: center;
+        justify-content: center;
+        background: var(--ink);
+        padding: 20px;
+      }
+      #contentView.visible {
+        display: flex;
+      }
+      .cv-shell {
+        width: 100%;
+        max-width: 580px;
+        display: flex;
+        flex-direction: column;
+        max-height: calc(100vh - 94px);
+      }
+      .cv-top {
+        background: var(--ink2);
+        border: 1px solid var(--line);
+        border-radius: 14px 14px 0 0;
+        border-bottom: none;
+        padding: 14px 20px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .cv-sel {
+        flex: 1;
+        background: var(--ink3);
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        color: var(--white);
+        font-family: var(--sans);
+        font-size: 13px;
+        padding: 8px 11px;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+      .cv-sel:focus {
+        border-color: var(--blue);
+      }
+      .cv-header {
+        background: var(--ink2);
+        border: 1px solid var(--line);
+        border-bottom: none;
+        border-top: 1px solid var(--line);
+        padding: 16px 20px 14px;
+      }
+      .cv-tpl-name {
+        font-size: 19px;
+        font-weight: 800;
+        letter-spacing: -0.3px;
+      }
+      .cv-tpl-sub {
+        font-size: 12px;
+        color: var(--smoke);
+        margin-top: 3px;
+      }
+      .cv-body {
+        background: var(--ink2);
+        border: 1px solid var(--line);
+        border-top: none;
+        border-bottom: none;
+        flex: 1;
+        overflow-y: auto;
+        padding: 18px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 13px;
+      }
+      .cv-body::-webkit-scrollbar {
+        width: 4px;
+      }
+      .cv-body::-webkit-scrollbar-thumb {
+        background: var(--line);
+        border-radius: 2px;
+      }
+      .cv-empty {
+        text-align: center;
+        padding: 36px;
+        color: var(--smoke);
+        font-size: 13px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 9px;
+      }
+      .cv-empty-icon {
+        font-size: 34px;
+      }
+      .cv-footer {
+        background: var(--ink2);
+        border: 1px solid var(--line);
+        border-top: 1px solid var(--line);
+        border-radius: 0 0 14px 14px;
+        padding: 14px 20px;
+      }
+
+      /* Content fields */
+      .cf-item {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+      .cf-label {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--fog);
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .cf-req-star {
+        color: var(--red);
+      }
+      .cf-type-tag {
+        font-size: 10px;
+        color: var(--smoke);
+        font-weight: 400;
+      }
+      .cf-input {
+        width: 100%;
+        background: var(--ink3);
+        border: 1.5px solid var(--line);
+        border-radius: 8px;
+        color: var(--white);
+        font-family: var(--sans);
+        font-size: 14px;
+        padding: 10px 13px;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+      .cf-input:focus {
+        border-color: var(--blue);
+      }
+      .cf-input::placeholder {
+        color: var(--smoke);
+        font-size: 13px;
+      }
+      .cf-ta {
+        width: 100%;
+        background: var(--ink3);
+        border: 1.5px solid var(--line);
+        border-radius: 8px;
+        color: var(--white);
+        font-family: var(--sans);
+        font-size: 14px;
+        padding: 10px 13px;
+        outline: none;
+        transition: border-color 0.2s;
+        resize: vertical;
+        min-height: 85px;
+        line-height: 1.5;
+      }
+      .cf-ta:focus {
+        border-color: var(--blue);
+      }
+      .cf-img-box {
+        border: 1.5px dashed var(--line);
+        border-radius: 8px;
+        padding: 18px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        position: relative;
+        background: var(--ink3);
+      }
+      .cf-img-box:hover {
+        border-color: var(--blue);
+      }
+      .cf-img-box input[type="file"] {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+      }
+      .cf-img-preview {
+        max-width: 100%;
+        max-height: 110px;
+        border-radius: 6px;
+        display: none;
+        margin: 0 auto 8px;
+      }
+      .cf-img-icon {
+        font-size: 26px;
+        margin-bottom: 5px;
+      }
+      .cf-img-hint {
+        font-size: 11px;
+        color: var(--smoke);
+      }
+      .cf-img-name {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--blue);
+        margin-top: 5px;
+        display: none;
+      }
+      .cf-url-row {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        margin-top: 6px;
+      }
+      .cf-url-label {
+        font-size: 11px;
+        color: var(--smoke);
+        white-space: nowrap;
+      }
+
+      .gen-btn {
+        width: 100%;
+        padding: 13px;
+        background: var(--lime);
+        color: var(--ink);
+        border: none;
+        border-radius: 9px;
+        font-family: var(--sans);
+        font-size: 14px;
+        font-weight: 800;
+        cursor: pointer;
+        transition: all 0.15s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+      .gen-btn:hover {
+        background: var(--lime-dark);
+        transform: translateY(-1px);
+      }
+
+      /* MODALS */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.75);
+        backdrop-filter: blur(5px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 500;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s;
+      }
+      .modal-overlay.open {
+        opacity: 1;
+        pointer-events: all;
+      }
+      .modal-card {
+        background: var(--ink2);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        width: 660px;
+        max-width: 92vw;
+        max-height: 82vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        transform: translateY(18px);
+        transition: transform 0.2s;
+      }
+      .modal-overlay.open .modal-card {
+        transform: translateY(0);
+      }
+      .modal-head {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .modal-title {
+        font-size: 14px;
+        font-weight: 700;
+      }
+      .modal-close {
+        margin-left: auto;
+        width: 26px;
+        height: 26px;
+        border-radius: 6px;
+        border: 1px solid var(--line);
+        background: var(--ink3);
+        color: var(--fog);
+        font-size: 13px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s;
+      }
+      .modal-close:hover {
+        border-color: var(--red);
+        color: var(--red);
+      }
+      .modal-bar {
+        padding: 9px 13px;
+        background: var(--ink3);
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .modal-fname {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--smoke);
+        margin-left: 4px;
+        flex: 1;
+      }
+      .copy-btn {
+        padding: 6px 15px;
+        background: var(--lime);
+        color: var(--ink);
+        border: none;
+        border-radius: 6px;
+        font-family: var(--sans);
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.15s;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .copy-btn:hover {
+        background: var(--lime-dark);
+      }
+      .copy-btn.copied {
+        background: var(--blue);
+        color: #fff;
+      }
+      .modal-code {
+        padding: 16px 18px;
+        font-family: var(--mono);
+        font-size: 12px;
+        line-height: 1.8;
+        white-space: pre-wrap;
+        word-break: break-all;
+        color: #c9d1d9;
+        overflow-y: auto;
+        flex: 1;
+      }
+      .modal-code::-webkit-scrollbar {
+        width: 4px;
+      }
+      .modal-code::-webkit-scrollbar-thumb {
+        background: var(--line);
+      }
+
+      .share-card {
+        max-width: 480px;
+      }
+      .share-info {
+        padding: 16px 20px;
+        font-size: 13px;
+        color: var(--smoke);
+        line-height: 1.6;
+        border-bottom: 1px solid var(--line);
+      }
+      .share-row {
+        display: flex;
+        gap: 8px;
+        padding: 16px 20px;
+      }
+      .share-url {
+        flex: 1;
+        background: var(--ink3);
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        color: var(--blue);
+        font-family: var(--mono);
+        font-size: 11px;
+        padding: 9px 11px;
+        outline: none;
+      }
+
+      /* TOAST */
+      .toast {
+        position: fixed;
+        bottom: 22px;
+        right: 22px;
+        font-size: 13px;
+        font-weight: 700;
+        padding: 11px 18px;
+        border-radius: 9px;
+        z-index: 9999;
+        transform: translateY(60px);
+        opacity: 0;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        pointer-events: none;
+      }
+      .toast.ok {
+        background: var(--lime);
+        color: var(--ink);
+      }
+      .toast.err {
+        background: var(--red);
+        color: #fff;
+      }
+      .toast.show {
+        transform: translateY(0);
+        opacity: 1;
+      }
+
+      ::-webkit-scrollbar {
+        width: 4px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--line);
+        border-radius: 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="loginGate">
+      <div class="gate-card">
+        <div class="gate-logo">Template<span class="dot">Forge</span></div>
+        <div class="gate-sub">Magento Content Builder — Select your role</div>
+        <div class="gate-heading">I am a...</div>
+        <div class="gate-options">
+          <button class="gate-btn dev" onclick="enterDev()">
+            <div class="gate-icon">⚙️</div>
+            <div>
+              <div>Frontend Developer</div>
+              <div class="gate-btn-desc">Create & manage HTML templates</div>
+            </div>
+          </button>
+          <button class="gate-btn content" onclick="showPassForm()">
+            <div class="gate-icon">✏️</div>
+            <div>
+              <div>Content Team Member</div>
+              <div class="gate-btn-desc">Fill in content & copy code for Magento</div>
+            </div>
+          </button>
+          <div id="passForm">
+            <input
+              class="gate-pass"
+              id="passInput"
+              type="password"
+              placeholder="Enter access code..."
+              onkeydown="if (event.key === 'Enter') checkPass();"
+            />
+            <div id="passError">Incorrect code. Try again.</div>
+            <button class="gate-btn content" onclick="checkPass()" style="margin-top: 2px">
+              <div class="gate-icon">🔓</div>
+              <div><div>Enter Content Mode</div></div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="app">
+      <div class="topbar">
+        <div class="app-logo">Template<span class="dot">Forge</span></div>
+        <div class="tbadge dev" id="bdgDev">⚙ Dev Mode</div>
+        <div class="tbadge content" id="bdgContent" style="display: none">✏ Content Mode</div>
+        <div class="topbar-right">
+          <button class="tbtn" id="exampleBtn" onclick="loadExample()" style="display: none">Load Example</button>
+          <button class="tbtn" onclick="switchRole()">Switch Role</button>
+        </div>
+      </div>
+
+      <!-- DEV VIEW -->
+      <div id="devView">
+        <div class="sidebar">
+          <div class="sb-head">
+            <span class="sb-title">Templates</span>
+            <button class="icon-btn" onclick="newTemplate()" title="New">+</button>
+          </div>
+          <div class="sb-list" id="sidebarList">
+            <div class="sb-empty">📂<br />No templates yet.<br />Click + to create one.</div>
+          </div>
+        </div>
+
+        <div class="editor-pane">
+          <div class="ptabs">
+            <button class="ptab active" onclick="switchTab('html', this)">HTML Template</button>
+            <button class="ptab" onclick="switchTab('fields', this)">Field Settings</button>
+          </div>
+          <div class="pane-body">
+            <div id="htmlTab" class="html-wrap">
+              <div class="code-hint">
+                Use <code>{{placeholder}}</code> for text/links · <code>{{image:name}}</code> for images<br />
+                Example: <code>&lt;h1&gt;{{banner_title}}&lt;/h1&gt;</code> ·
+                <code>&lt;img src="{{image:hero}}"&gt;</code>
+              </div>
+              <textarea
+                class="tpl-ta"
+                id="templateEditor"
+                placeholder='Paste your HTML template here...
+
+Example:
+<div class="banner">
+  <img src="{{image:hero_image}}" alt="{{image_alt}}" />
+  <h1>{{banner_title}}</h1>
+  <p>{{description}}</p>
+  <a href="{{cta_url}}">{{cta_text}}</a>
+</div>'
+                oninput="onEditorChange()"
+              ></textarea>
+            </div>
+            <div id="fieldsTab" class="fields-wrap" style="display: none">
+              <div id="fieldConfigList">
+                <div class="fields-empty">
+                  No placeholders detected.<br />Add
+                  <code style="font-family: var(--mono); color: var(--lime)">{{tags}}</code> in the HTML tab first.
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="save-bar">
+            <input class="save-input" id="saveName" placeholder="Template name (e.g. Hero Banner)..." />
+            <button class="tbtn lime" onclick="saveTemplate()">💾 Save</button>
+          </div>
+        </div>
+
+        <div class="preview-pane">
+          <div class="prev-head">
+            <span class="prev-label">Preview</span>
+            <div style="margin-left: auto; display: flex; gap: 8px">
+              <button class="tbtn lime" id="shareBtn" onclick="openShareFor(null)" style="display: none">
+                🔗 Share
+              </button>
+            </div>
+          </div>
+          <div class="prev-body">
+            <div class="prev-frame">
+              <div class="prev-bar">
+                <div class="wdot"></div>
+                <div class="wdot"></div>
+                <div class="wdot"></div>
+              </div>
+              <div class="prev-inner" id="devPreview">
+                <span style="color: #aaa; font-size: 13px">Paste a template to preview...</span>
+              </div>
+            </div>
+            <div>
+              <div
+                style="
+                  font-size: 11px;
+                  text-transform: uppercase;
+                  letter-spacing: 1.5px;
+                  color: var(--smoke);
+                  font-weight: 700;
+                  margin-bottom: 7px;
+                "
+              >
+                Detected Fields
+              </div>
+              <div class="fields-detected" id="fieldChips">
+                <span style="font-size: 12px; color: var(--smoke)">None</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTENT VIEW -->
+      <div id="contentView">
+        <div class="cv-shell">
+          <div class="cv-top">
+            <span style="font-size: 12px; font-weight: 700; color: var(--smoke); white-space: nowrap">Template:</span>
+            <select class="cv-sel" id="contentSel" onchange="loadContent()">
+              <option value="">— Select a template —</option>
+            </select>
+          </div>
+          <div class="cv-header">
+            <div class="cv-tpl-name" id="cvName">Select a template above</div>
+            <div class="cv-tpl-sub" id="cvSub">Fill in the fields and click Generate to get your Magento code.</div>
+          </div>
+          <div class="cv-body" id="cvBody">
+            <div class="cv-empty">
+              <div class="cv-empty-icon">📋</div>
+              <div>Choose a template above to get started</div>
+            </div>
+          </div>
+          <div class="cv-footer">
+            <button class="gen-btn" onclick="generateCode()">⚡ Generate & Copy Code</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Output Modal -->
+    <div class="modal-overlay" id="outModal">
+      <div class="modal-card">
+        <div class="modal-head">
+          <span style="font-size: 17px">✅</span>
+          <span class="modal-title">Code Ready — Paste into Magento</span>
+          <button class="modal-close" onclick="closeModal('outModal')">✕</button>
+        </div>
+        <div class="modal-bar">
+          <div class="wdot" style="background: #ff5f57"></div>
+          <div class="wdot" style="background: #febc2e"></div>
+          <div class="wdot" style="background: #28c840"></div>
+          <span class="modal-fname">magento-output.html</span>
+          <button class="copy-btn" id="copyOutBtn" onclick="copyOut()">⎘ Copy Code</button>
+        </div>
+        <div class="modal-code" id="outCode"></div>
+      </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div class="modal-overlay" id="shareModal">
+      <div class="modal-card share-card">
+        <div class="modal-head">
+          <span style="font-size: 17px">🔗</span>
+          <span class="modal-title">Share with Content Team</span>
+          <button class="modal-close" onclick="closeModal('shareModal')">✕</button>
+        </div>
+        <div class="share-info">
+          Send this link to your content team. They'll see only the input form — no code, no template visible.
+        </div>
+        <div class="share-row">
+          <input class="share-url" id="shareUrl" readonly />
+          <button class="copy-btn" id="shareCopyBtn" onclick="copyShare()">⎘ Copy</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+      let templates = JSON.parse(localStorage.getItem("tforge_v2") || "[]");
+      let activeId = null;
+      let placeholders = [];
+      let fieldMeta = {};
+
+      // ── GATE ──
+      function enterDev() {
+        startApp("dev");
+      }
+      function showPassForm() {
+        document.getElementById("passForm").style.display = "flex";
+        document.getElementById("passInput").focus();
+      }
+      function checkPass() {
+        const v = document.getElementById("passInput").value.trim();
+        if (v.length > 0) {
+          startApp("content");
+        } else {
+          document.getElementById("passError").style.display = "block";
+        }
+      }
+
+      function startApp(role) {
+        document.getElementById("loginGate").style.display = "none";
+        document.getElementById("app").classList.add("visible");
+        if (role === "dev") {
+          document.getElementById("devView").classList.add("visible");
+          document.getElementById("contentView").classList.remove("visible");
+          document.getElementById("bdgDev").style.display = "";
+          document.getElementById("bdgContent").style.display = "none";
+          document.getElementById("exampleBtn").style.display = "";
+          renderSidebar();
+        } else {
+          document.getElementById("contentView").classList.add("visible");
+          document.getElementById("devView").classList.remove("visible");
+          document.getElementById("bdgDev").style.display = "none";
+          document.getElementById("bdgContent").style.display = "";
+          document.getElementById("exampleBtn").style.display = "none";
+          populateContentSelect();
+          checkUrlTemplate();
+        }
+      }
+
+      function switchRole() {
+        document.getElementById("app").classList.remove("visible");
+        document.getElementById("loginGate").style.display = "flex";
+        document.getElementById("passForm").style.display = "none";
+        document.getElementById("passInput").value = "";
+        document.getElementById("passError").style.display = "none";
+        activeId = null;
+      }
+
+      // ── DEV ──
+      function newTemplate() {
+        activeId = "tpl_" + Date.now();
+        document.getElementById("templateEditor").value = "";
+        document.getElementById("saveName").value = "";
+        document.getElementById("devPreview").innerHTML =
+          '<span style="color:#aaa;font-size:13px;">Paste a template to preview...</span>';
+        document.getElementById("fieldChips").innerHTML =
+          '<span style="font-size:12px;color:var(--smoke);">None</span>';
+        document.getElementById("fieldConfigList").innerHTML =
+          '<div class="fields-empty">No placeholders detected.<br>Add <code style="font-family:var(--mono);color:var(--lime);">{{tags}}</code> in the HTML tab first.</div>';
+        placeholders = [];
+        fieldMeta = {};
+        document.getElementById("shareBtn").style.display = "none";
+        renderSidebar();
+      }
+
+      function onEditorChange() {
+        const code = document.getElementById("templateEditor").value;
+        const txt = [...code.matchAll(/\{\{(?!image:)(\w+)\}\}/g)].map((m) => m[1]);
+        const imgs = [...code.matchAll(/\{\{image:(\w+)\}\}/g)].map((m) => "image:" + m[1]);
+        placeholders = [...new Set([...txt, ...imgs])];
+
+        const preview = code
+          .replace(/\{\{image:(\w+)\}\}/g, (_, k) => `<span class="chip">📷 ${k}</span>`)
+          .replace(/\{\{(\w+)\}\}/g, (_, k) => `<span class="chip">${k}</span>`);
+        document.getElementById("devPreview").innerHTML =
+          preview || '<span style="color:#aaa;font-size:13px;">Paste a template to preview...</span>';
+
+        document.getElementById("fieldChips").innerHTML = placeholders.length
+          ? placeholders
+              .map(
+                (k) =>
+                  `<span class="fchip ${k.startsWith("image:") ? "img" : "text"}">${k.startsWith("image:") ? "📷 " : ""}{${k.replace("image:", "")}}</span>`,
+              )
+              .join("")
+          : '<span style="font-size:12px;color:var(--smoke);">None</span>';
+
+        buildFieldConfig();
+      }
+
+      function buildFieldConfig() {
+        const el = document.getElementById("fieldConfigList");
+        if (!placeholders.length) {
+          el.innerHTML =
+            '<div class="fields-empty">No placeholders detected.<br>Add <code style="font-family:var(--mono);color:var(--lime);">{{tags}}</code> in the HTML tab first.</div>';
+          return;
+        }
+        el.innerHTML = placeholders
+          .map((key) => {
+            const isImg = key.startsWith("image:");
+            const bare = key.replace("image:", "");
+            const meta = fieldMeta[key] || {};
+            const defLabel = bare.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+            const type = meta.type || (isImg ? "image" : guessType(bare));
+            return `<div class="fcrow">
+      <div class="fcrow-head">
+        <span>${isImg ? "📷" : "📝"}</span>
+        <span class="fcrow-key">{{${key}}}</span>
+        <select class="fc-type-sel" id="type_${bare}" ${isImg ? "disabled" : ""} onchange="syncMeta('${key}')">
+          <option value="text" ${type === "text" ? "selected" : ""}>Text</option>
+          <option value="textarea" ${type === "textarea" ? "selected" : ""}>Long Text</option>
+          <option value="url" ${type === "url" ? "selected" : ""}>URL / Link</option>
+          <option value="image" ${type === "image" || isImg ? "selected" : ""}>Image</option>
+        </select>
+      </div>
+      <div class="fcrow-body">
+        <input class="fc-lbl-input" id="label_${bare}" value="${meta.label || defLabel}" placeholder="Label for content team..." oninput="syncMeta('${key}')" />
+        <label class="fc-req"><input type="checkbox" id="req_${bare}" ${meta.required ? "checked" : ""} onchange="syncMeta('${key}')" /> Required</label>
+      </div>
+    </div>`;
+          })
+          .join("");
+      }
+
+      function syncMeta(key) {
+        const bare = key.replace("image:", "");
+        fieldMeta[key] = {
+          label: document.getElementById("label_" + bare)?.value || bare,
+          type: document.getElementById("type_" + bare)?.value || "text",
+          required: document.getElementById("req_" + bare)?.checked || false,
+        };
+      }
+
+      function guessType(k) {
+        if (/url|link|href|src/.test(k)) return "url";
+        if (/description|text|content|body|paragraph|detail/.test(k)) return "textarea";
+        return "text";
+      }
+
+      function switchTab(tab, btn) {
+        document.querySelectorAll(".ptab").forEach((t) => t.classList.remove("active"));
+        btn.classList.add("active");
+        document.getElementById("htmlTab").style.display = tab === "html" ? "flex" : "none";
+        document.getElementById("fieldsTab").style.display = tab === "fields" ? "flex" : "none";
+        if (tab === "fields") buildFieldConfig();
+      }
+
+      function saveTemplate() {
+        const name = document.getElementById("saveName").value.trim();
+        const code = document.getElementById("templateEditor").value.trim();
+        if (!name) {
+          toast("Enter a template name!", "err");
+          return;
+        }
+        if (!code) {
+          toast("Template is empty!", "err");
+          return;
+        }
+        placeholders.forEach((k) => syncMeta(k));
+        const tpl = {
+          id: activeId || "tpl_" + Date.now(),
+          name,
+          code,
+          fieldMeta: { ...fieldMeta },
+          placeholders: [...placeholders],
+          date: new Date().toLocaleDateString(),
+        };
+        activeId = tpl.id;
+        const idx = templates.findIndex((t) => t.id === tpl.id);
+        if (idx >= 0) templates[idx] = tpl;
+        else templates.push(tpl);
+        localStorage.setItem("tforge_v2", JSON.stringify(templates));
+        renderSidebar();
+        document.getElementById("shareBtn").style.display = "";
+        toast(`"${name}" saved!`, "ok");
+      }
+
+      function loadDevTpl(id) {
+        const t = templates.find((x) => x.id === id);
+        if (!t) return;
+        activeId = id;
+        fieldMeta = { ...(t.fieldMeta || {}) };
+        placeholders = t.placeholders || [];
+        document.getElementById("templateEditor").value = t.code;
+        document.getElementById("saveName").value = t.name;
+        onEditorChange();
+        document.getElementById("shareBtn").style.display = "";
+        renderSidebar();
+      }
+
+      function deleteTpl(id, e) {
+        e.stopPropagation();
+        const t = templates.find((x) => x.id === id);
+        templates = templates.filter((x) => x.id !== id);
+        localStorage.setItem("tforge_v2", JSON.stringify(templates));
+        if (activeId === id) {
+          activeId = null;
+          document.getElementById("templateEditor").value = "";
+          document.getElementById("saveName").value = "";
+          document.getElementById("devPreview").innerHTML =
+            '<span style="color:#aaa;font-size:13px;">Paste a template to preview...</span>';
+          document.getElementById("shareBtn").style.display = "none";
+          placeholders = [];
+          fieldMeta = {};
+        }
+        renderSidebar();
+        toast(`"${t?.name}" deleted`, "ok");
+      }
+
+      function renderSidebar() {
+        const el = document.getElementById("sidebarList");
+        el.innerHTML = templates.length
+          ? templates
+              .map(
+                (t) => `<div class="tpl-item ${t.id === activeId ? "active" : ""}" onclick="loadDevTpl('${t.id}')">
+        <div class="tpl-icon">📄</div>
+        <div class="tpl-info"><div class="tpl-name">${t.name}</div><div class="tpl-meta">${(t.placeholders || []).length} fields · ${t.date}</div></div>
+        <div class="tpl-acts">
+          <button class="mini-btn shr" onclick="openShareFor('${t.id}',event)" title="Share">🔗</button>
+          <button class="mini-btn del" onclick="deleteTpl('${t.id}',event)" title="Delete">✕</button>
+        </div>
+      </div>`,
+              )
+              .join("")
+          : '<div class="sb-empty">📂<br>No templates yet.<br>Click + to create one.</div>';
+      }
+
+      function loadExample() {
+        const code = `<div class="promo-banner" style="display:flex;gap:28px;align-items:center;background:#f8f8f8;padding:36px;border-radius:10px;">
+  <div style="flex:1;">
+    <p style="font-size:12px;text-transform:uppercase;letter-spacing:1.5px;color:#888;margin-bottom:8px;">{{tag_line}}</p>
+    <h1 style="font-size:30px;font-weight:800;color:#111;margin-bottom:10px;line-height:1.2;">{{banner_title}}</h1>
+    <p style="font-size:15px;color:#555;line-height:1.6;margin-bottom:22px;">{{description}}</p>
+    <a href="{{cta_url}}" style="display:inline-block;background:#111;color:#fff;padding:11px 26px;border-radius:6px;text-decoration:none;font-weight:700;font-size:14px;">{{cta_text}}</a>
+  </div>
+  <div style="flex:0 0 260px;">
+    <img src="{{image:product_image}}" alt="{{image_alt}}" style="width:100%;border-radius:10px;" />
+  </div>
+</div>`;
+        activeId = "tpl_ex_" + Date.now();
+        document.getElementById("templateEditor").value = code;
+        document.getElementById("saveName").value = "Promo Banner";
+        fieldMeta = {};
+        onEditorChange();
+        toast("Example loaded — hit Save to keep it!", "ok");
+      }
+
+      // ── SHARE ──
+      function openShareFor(id, e) {
+        if (e) e.stopPropagation();
+        const tid = id || activeId;
+        if (!tid) {
+          toast("Save the template first!", "err");
+          return;
+        }
+        const tpl = templates.find((t) => t.id === tid);
+        if (!tpl) {
+          toast("Save the template first!", "err");
+          return;
+        }
+        const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(tpl))));
+        const url = `${location.origin}${location.pathname}?role=content&tpl=${encoded}`;
+        document.getElementById("shareUrl").value = url;
+        document.getElementById("shareModal").classList.add("open");
+      }
+
+      function copyShare() {
+        const url = document.getElementById("shareUrl").value;
+        navigator.clipboard.writeText(url).then(() => {
+          const b = document.getElementById("shareCopyBtn");
+          b.classList.add("copied");
+          b.textContent = "✓ Copied!";
+          toast("Link copied — send it to your content team!", "ok");
+          setTimeout(() => {
+            b.classList.remove("copied");
+            b.innerHTML = "⎘ Copy";
+          }, 2000);
+        });
+      }
+
+      // ── CONTENT ──
+      function populateContentSelect() {
+        const sel = document.getElementById("contentSel");
+        sel.innerHTML = '<option value="">— Select a template —</option>';
+        templates.forEach((t) => {
+          const o = document.createElement("option");
+          o.value = t.id;
+          o.textContent = t.name;
+          sel.appendChild(o);
+        });
+        document.getElementById("cvBody").innerHTML = templates.length
+          ? '<div class="cv-empty"><div class="cv-empty-icon">📋</div><div>Choose a template above to get started</div></div>'
+          : '<div class="cv-empty"><div class="cv-empty-icon">📭</div><div>No templates available yet.<br>Ask your frontend team to create one.</div></div>';
+      }
+
+      function checkUrlTemplate() {
+        const p = new URLSearchParams(location.search);
+        if (!p.get("tpl")) return;
+        try {
+          const tpl = JSON.parse(decodeURIComponent(escape(atob(p.get("tpl")))));
+          if (!templates.find((t) => t.id === tpl.id)) templates.push(tpl);
+          populateContentSelect();
+          setTimeout(() => {
+            document.getElementById("contentSel").value = tpl.id;
+            loadContent();
+          }, 100);
+        } catch (e) {}
+      }
+
+      function loadContent() {
+        const id = document.getElementById("contentSel").value;
+        if (!id) {
+          document.getElementById("cvBody").innerHTML =
+            '<div class="cv-empty"><div class="cv-empty-icon">📋</div><div>Choose a template above to get started</div></div>';
+          return;
+        }
+        const tpl = templates.find((t) => t.id === id);
+        if (!tpl) return;
+        document.getElementById("cvName").textContent = tpl.name;
+        document.getElementById("cvSub").textContent =
+          "Fill in all fields below, then click Generate to get your code.";
+        const phs = tpl.placeholders || [];
+        if (!phs.length) {
+          document.getElementById("cvBody").innerHTML =
+            '<div class="cv-empty"><div class="cv-empty-icon">⚠️</div><div>This template has no editable fields.</div></div>';
+          return;
+        }
+        document.getElementById("cvBody").innerHTML = phs
+          .map((key) => {
+            const isImg = key.startsWith("image:");
+            const bare = key.replace("image:", "");
+            const meta = (tpl.fieldMeta || {})[key] || {};
+            const label = meta.label || bare.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+            const type = meta.type || (isImg ? "image" : guessType(bare));
+            const req = meta.required;
+            const star = req ? '<span class="cf-req-star">*</span>' : "";
+            if (type === "image" || isImg)
+              return `<div class="cf-item">
+      <div class="cf-label">${label}${star}<span class="cf-type-tag">Image</span></div>
+      <div class="cf-img-box" id="ibox_${bare}">
+        <input type="file" accept="image/*" onchange="handleImg('${bare}',this)" />
+        <img class="cf-img-preview" id="iprev_${bare}" /><div class="cf-img-icon">📷</div>
+        <div class="cf-img-hint">Click to upload · or paste URL below</div>
+        <div class="cf-img-name" id="iname_${bare}"></div>
+      </div>
+      <input class="cf-input" id="field_${bare}" placeholder="Or paste image URL..." style="font-size:12px;font-family:var(--mono);" />
+    </div>`;
+            if (type === "textarea")
+              return `<div class="cf-item"><div class="cf-label">${label}${star}</div><textarea class="cf-ta" id="field_${bare}" placeholder="Enter ${label}..."></textarea></div>`;
+            return `<div class="cf-item"><div class="cf-label">${label}${star}</div><input class="cf-input" id="field_${bare}" type="${type === "url" ? "url" : "text"}" placeholder="${type === "url" ? "https://" : "Enter " + label + "..."}" /></div>`;
+          })
+          .join("");
+      }
+
+      function handleImg(bare, input) {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const d = e.target.result;
+          const prev = document.getElementById("iprev_" + bare);
+          prev.src = d;
+          prev.style.display = "block";
+          document.getElementById("iname_" + bare).textContent = file.name;
+          document.getElementById("iname_" + bare).style.display = "block";
+          document.getElementById("field_" + bare).value = d;
+        };
+        reader.readAsDataURL(file);
+      }
+
+      function generateCode() {
+        const id = document.getElementById("contentSel").value;
+        if (!id) {
+          toast("Select a template first!", "err");
+          return;
+        }
+        const tpl = templates.find((t) => t.id === id);
+        if (!tpl) return;
+        const phs = tpl.placeholders || [];
+        const missing = phs
+          .filter((key) => {
+            const bare = key.replace("image:", "");
+            const m = (tpl.fieldMeta || {})[key] || {};
+            return m.required && !document.getElementById("field_" + bare)?.value?.trim();
+          })
+          .map((key) => {
+            const m = (tpl.fieldMeta || {})[key] || {};
+            return m.label || key.replace("image:", "");
+          });
+        if (missing.length) {
+          toast("Required: " + missing.join(", "), "err");
+          return;
+        }
+        let result = tpl.code;
+        phs.forEach((key) => {
+          const bare = key.replace("image:", "");
+          const val = document.getElementById("field_" + bare)?.value || "";
+          result = result.split("{{" + key + "}}").join(val);
+        });
+        document.getElementById("outCode").textContent = result;
+        document.getElementById("outModal").classList.add("open");
+        navigator.clipboard
+          .writeText(result)
+          .then(() => {
+            const b = document.getElementById("copyOutBtn");
+            b.classList.add("copied");
+            b.innerHTML = "✓ Copied!";
+            setTimeout(() => {
+              b.classList.remove("copied");
+              b.innerHTML = "⎘ Copy Code";
+            }, 3000);
+          })
+          .catch(() => {});
+      }
+
+      function copyOut() {
+        navigator.clipboard.writeText(document.getElementById("outCode").textContent).then(() => {
+          const b = document.getElementById("copyOutBtn");
+          b.classList.add("copied");
+          b.innerHTML = "✓ Copied!";
+          toast("Copied!", "ok");
+          setTimeout(() => {
+            b.classList.remove("copied");
+            b.innerHTML = "⎘ Copy Code";
+          }, 2000);
+        });
+      }
+
+      function closeModal(id) {
+        document.getElementById(id).classList.remove("open");
+      }
+
+      function toast(msg, type = "ok") {
+        const el = document.getElementById("toast");
+        el.textContent = msg;
+        el.className = "toast " + type;
+        el.classList.add("show");
+        setTimeout(() => el.classList.remove("show"), 2800);
+      }
+
+      document.querySelectorAll(".modal-overlay").forEach((el) =>
+        el.addEventListener("click", (e) => {
+          if (e.target === el) el.classList.remove("open");
+        }),
+      );
+
+      // Check URL on load
+      window.addEventListener("load", () => {
+        const p = new URLSearchParams(location.search);
+        if (p.get("role") === "content") {
+          document.querySelector(".gate-btn.content").click();
+        }
+      });
+    </script>
+  </body>
+</html>

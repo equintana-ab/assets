@@ -1,0 +1,904 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Template Builder</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Syne:wght@400;600;800&display=swap");
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #0e0e11;
+        --surface: #16161c;
+        --surface2: #1e1e28;
+        --border: #2a2a38;
+        --accent: #7c6dfa;
+        --accent2: #fa6d8f;
+        --text: #e8e8f0;
+        --muted: #6b6b80;
+        --green: #4ade80;
+        --mono: "IBM Plex Mono", monospace;
+        --sans: "Syne", sans-serif;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--sans);
+        min-height: 100vh;
+        display: grid;
+        grid-template-rows: auto 1fr;
+      }
+
+      header {
+        border-bottom: 1px solid var(--border);
+        padding: 18px 32px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        background: var(--surface);
+      }
+
+      .logo {
+        font-size: 18px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+      }
+
+      .logo span {
+        color: var(--accent);
+      }
+
+      .mode-tabs {
+        margin-left: auto;
+        display: flex;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 3px;
+        gap: 2px;
+      }
+
+      .mode-tab {
+        padding: 6px 18px;
+        border: none;
+        background: transparent;
+        color: var(--muted);
+        font-family: var(--sans);
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+
+      .mode-tab.active {
+        background: var(--accent);
+        color: #fff;
+      }
+
+      .main {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        height: calc(100vh - 61px);
+        overflow: hidden;
+      }
+
+      .panel {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        border-right: 1px solid var(--border);
+      }
+
+      .panel:last-child {
+        border-right: none;
+      }
+
+      .panel-header {
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--surface);
+        flex-shrink: 0;
+      }
+
+      .panel-title {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: var(--muted);
+      }
+
+      .badge {
+        font-family: var(--mono);
+        font-size: 10px;
+        padding: 2px 8px;
+        border-radius: 100px;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        color: var(--accent);
+      }
+
+      .panel-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+      }
+
+      .panel-body::-webkit-scrollbar {
+        width: 4px;
+      }
+      .panel-body::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .panel-body::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 2px;
+      }
+
+      /* FRONTEND MODE */
+      .template-editor {
+        width: 100%;
+        height: 100%;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        color: var(--text);
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.7;
+        padding: 16px;
+        resize: none;
+        outline: none;
+        transition: border-color 0.2s;
+        min-height: 300px;
+      }
+
+      .template-editor:focus {
+        border-color: var(--accent);
+      }
+
+      .hint-box {
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+        border-radius: 8px;
+        padding: 14px 16px;
+        margin-bottom: 16px;
+        font-size: 13px;
+        line-height: 1.6;
+        color: var(--muted);
+      }
+
+      .hint-box strong {
+        color: var(--accent);
+        font-family: var(--mono);
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        font-family: var(--sans);
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+
+      .btn-primary {
+        background: var(--accent);
+        color: #fff;
+      }
+
+      .btn-primary:hover {
+        background: #6a5ce8;
+        transform: translateY(-1px);
+      }
+
+      .btn-secondary {
+        background: var(--surface2);
+        color: var(--text);
+        border: 1px solid var(--border);
+      }
+
+      .btn-secondary:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+
+      .btn-green {
+        background: var(--green);
+        color: #000;
+      }
+
+      .btn-green:hover {
+        opacity: 0.9;
+      }
+
+      .actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 14px;
+        flex-wrap: wrap;
+      }
+
+      /* CONTENT MODE - Fields */
+      .field-group {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .field-item {
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        overflow: hidden;
+        transition: border-color 0.2s;
+      }
+
+      .field-item:focus-within {
+        border-color: var(--accent);
+      }
+
+      .field-label {
+        padding: 8px 14px;
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--accent);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .field-label .field-type {
+        margin-left: auto;
+        color: var(--muted);
+        font-size: 10px;
+      }
+
+      .field-input {
+        width: 100%;
+        background: transparent;
+        border: none;
+        outline: none;
+        color: var(--text);
+        font-family: var(--sans);
+        font-size: 14px;
+        padding: 12px 14px;
+      }
+
+      .field-textarea {
+        width: 100%;
+        background: transparent;
+        border: none;
+        outline: none;
+        color: var(--text);
+        font-family: var(--sans);
+        font-size: 14px;
+        padding: 12px 14px;
+        resize: vertical;
+        min-height: 80px;
+        line-height: 1.5;
+      }
+
+      /* OUTPUT */
+      .output-box {
+        position: relative;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      .output-topbar {
+        padding: 10px 14px;
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .dot-red {
+        background: #ff5f57;
+      }
+      .dot-yellow {
+        background: #febc2e;
+      }
+      .dot-green {
+        background: #28c840;
+      }
+
+      .output-filename {
+        margin-left: 4px;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--muted);
+      }
+
+      .copy-btn {
+        margin-left: auto;
+        padding: 5px 14px;
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        font-family: var(--sans);
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .copy-btn:hover {
+        background: #6a5ce8;
+      }
+      .copy-btn.copied {
+        background: var(--green);
+        color: #000;
+      }
+
+      .output-code {
+        padding: 16px;
+        font-family: var(--mono);
+        font-size: 12.5px;
+        line-height: 1.7;
+        white-space: pre-wrap;
+        word-break: break-all;
+        color: #c9d1d9;
+        max-height: 420px;
+        overflow-y: auto;
+      }
+
+      .output-code::-webkit-scrollbar {
+        width: 4px;
+      }
+      .output-code::-webkit-scrollbar-thumb {
+        background: var(--border);
+      }
+
+      /* Preview */
+      .preview-frame {
+        background: #fff;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        overflow: hidden;
+        min-height: 200px;
+      }
+
+      .preview-inner {
+        padding: 24px;
+        font-family: sans-serif;
+      }
+
+      /* Saved templates */
+      .template-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .template-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+
+      .template-item:hover {
+        border-color: var(--accent);
+      }
+
+      .template-name {
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .template-meta {
+        font-size: 11px;
+        color: var(--muted);
+        margin-left: auto;
+        font-family: var(--mono);
+      }
+
+      .delete-btn {
+        background: none;
+        border: none;
+        color: var(--muted);
+        cursor: pointer;
+        font-size: 14px;
+        padding: 2px 6px;
+        border-radius: 4px;
+        transition: all 0.15s;
+      }
+
+      .delete-btn:hover {
+        color: var(--accent2);
+        background: rgba(250, 109, 143, 0.1);
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .empty-icon {
+        font-size: 32px;
+        margin-bottom: 12px;
+      }
+
+      .section-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: var(--muted);
+        font-weight: 600;
+        margin-bottom: 10px;
+        margin-top: 20px;
+      }
+
+      .section-label:first-child {
+        margin-top: 0;
+      }
+
+      .save-row {
+        display: flex;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .name-input {
+        flex: 1;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        color: var(--text);
+        font-family: var(--sans);
+        font-size: 13px;
+        padding: 8px 12px;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+
+      .name-input:focus {
+        border-color: var(--accent);
+      }
+      .name-input::placeholder {
+        color: var(--muted);
+      }
+
+      /* Mode hide/show */
+      .dev-only,
+      .content-only {
+        display: none;
+      }
+      body.mode-dev .dev-only {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+      body.mode-content .content-only {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+
+      .highlight-placeholder {
+        color: #fbbf24;
+      }
+
+      /* Notification */
+      .notif {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        background: var(--green);
+        color: #000;
+        font-weight: 700;
+        font-size: 13px;
+        padding: 12px 20px;
+        border-radius: 10px;
+        transform: translateY(80px);
+        opacity: 0;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        z-index: 999;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .notif.show {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    </style>
+  </head>
+  <body class="mode-dev">
+    <header>
+      <div class="logo">Template<span>Builder</span></div>
+      <div style="font-size: 12px; color: var(--muted); margin-left: 4px">for Magento</div>
+      <div class="mode-tabs">
+        <button class="mode-tab active" onclick="setMode('dev')">⚙ Dev Mode</button>
+        <button class="mode-tab" onclick="setMode('content')">✏ Content Mode</button>
+      </div>
+    </header>
+
+    <div class="main">
+      <!-- LEFT PANEL -->
+      <div class="panel">
+        <!-- DEV: Template Editor -->
+        <div class="dev-only" style="height: 100%">
+          <div class="panel-header">
+            <div class="panel-title">HTML Template</div>
+            <div class="badge">Frontend Team</div>
+          </div>
+          <div class="panel-body" style="display: flex; flex-direction: column; gap: 16px">
+            <div class="hint-box">
+              Wrap editable content with <strong>{{placeholder_name}}</strong> — these become input fields for the
+              content team. Example: <strong>&lt;h1&gt;{{hero_title}}&lt;/h1&gt;</strong>
+            </div>
+
+            <textarea
+              class="template-editor"
+              id="templateEditor"
+              placeholder='Paste your HTML template here...
+Example:
+<div class="banner">
+  <h1>{{headline}}</h1>
+  <p>{{description}}</p>
+  <a href="{{button_url}}">{{button_text}}</a>
+</div>'
+              oninput="onTemplateChange()"
+            ></textarea>
+
+            <div class="actions">
+              <button class="btn btn-primary" onclick="parseTemplate()">⚡ Parse Placeholders</button>
+              <button class="btn btn-secondary" onclick="loadExample()">Load Example</button>
+            </div>
+
+            <div class="section-label">Save Template</div>
+            <div class="save-row">
+              <input class="name-input" id="templateName" placeholder="Template name (e.g. Hero Banner)" />
+              <button class="btn btn-primary" onclick="saveTemplate()">Save</button>
+            </div>
+
+            <div class="section-label">Saved Templates</div>
+            <div class="template-list" id="templateList"></div>
+          </div>
+        </div>
+
+        <!-- CONTENT: Fields -->
+        <div class="content-only" style="height: 100%">
+          <div class="panel-header">
+            <div class="panel-title">Fill In Content</div>
+            <div class="badge">Content Team</div>
+          </div>
+          <div class="panel-body">
+            <div class="section-label">Choose a Template</div>
+            <div class="template-list" id="contentTemplateList"></div>
+
+            <div id="fieldsSection" style="display: none">
+              <div class="section-label" style="margin-top: 24px">Edit Content Fields</div>
+              <div class="field-group" id="fieldsContainer"></div>
+              <div class="actions" style="margin-top: 20px">
+                <button class="btn btn-primary" onclick="generateOutput()">⚡ Generate Code</button>
+                <button class="btn btn-secondary" onclick="clearFields()">Clear All</button>
+              </div>
+            </div>
+
+            <div id="noTemplates" class="empty-state">
+              <div class="empty-icon">📋</div>
+              No templates saved yet.<br />Switch to <strong>Dev Mode</strong> to create one.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT PANEL -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Output</div>
+          <div class="badge" id="outputBadge">Preview + Code</div>
+        </div>
+        <div class="panel-body" style="display: flex; flex-direction: column; gap: 20px">
+          <div>
+            <div class="section-label">Live Preview</div>
+            <div class="preview-frame">
+              <div class="preview-inner" id="previewArea">
+                <span style="color: #aaa; font-size: 13px">Preview will appear here...</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="section-label">Generated Code</div>
+            <div class="output-box">
+              <div class="output-topbar">
+                <div class="dot dot-red"></div>
+                <div class="dot dot-yellow"></div>
+                <div class="dot dot-green"></div>
+                <span class="output-filename">output.html</span>
+                <button class="copy-btn" id="copyBtn" onclick="copyCode()"><span>⎘</span> Copy Code</button>
+              </div>
+              <div class="output-code" id="outputCode"><!-- Generated code will appear here --></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="notif" id="notif"></div>
+
+    <script>
+      let currentTemplate = "";
+      let placeholders = [];
+      let templates = JSON.parse(localStorage.getItem("mg_templates") || "[]");
+
+      function setMode(mode) {
+        document.body.className = "mode-" + mode;
+        document.querySelectorAll(".mode-tab").forEach((t, i) => {
+          t.classList.toggle("active", (mode === "dev" && i === 0) || (mode === "content" && i === 1));
+        });
+        if (mode === "content") renderContentTemplateList();
+      }
+
+      function onTemplateChange() {
+        const val = document.getElementById("templateEditor").value;
+        currentTemplate = val;
+        // Live preview of template structure
+        const preview = val.replace(
+          /\{\{(\w+)\}\}/g,
+          (_, k) => `<span style="background:#fbbf2433;color:#fbbf24;padding:0 3px;border-radius:3px;">[${k}]</span>`,
+        );
+        document.getElementById("previewArea").innerHTML =
+          preview || '<span style="color:#aaa;font-size:13px;">Preview will appear here...</span>';
+        document.getElementById("outputCode").textContent = val || "<!-- Generated code will appear here -->";
+      }
+
+      function parseTemplate() {
+        const val = document.getElementById("templateEditor").value.trim();
+        if (!val) {
+          showNotif("⚠ Paste a template first!", true);
+          return;
+        }
+        currentTemplate = val;
+        const matches = [...val.matchAll(/\{\{(\w+)\}\}/g)];
+        placeholders = [...new Set(matches.map((m) => m[1]))];
+        if (!placeholders.length) {
+          showNotif("⚠ No {{placeholders}} found in template!", true);
+          return;
+        }
+        showNotif(`✓ Found ${placeholders.length} placeholder${placeholders.length > 1 ? "s" : ""}`);
+        buildFields();
+      }
+
+      function buildFields(values = {}) {
+        const container = document.getElementById("fieldsContainer");
+        container.innerHTML = "";
+        placeholders.forEach((key) => {
+          const label = key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+          const isLong =
+            key.includes("description") || key.includes("text") || key.includes("content") || key.includes("body");
+          const isUrl = key.includes("url") || key.includes("link") || key.includes("href") || key.includes("src");
+
+          const item = document.createElement("div");
+          item.className = "field-item";
+          item.innerHTML = `
+        <div class="field-label">
+          <span>{{${key}}}</span>
+          <span class="field-type">${isUrl ? "URL" : isLong ? "Text Area" : "Text"}</span>
+        </div>
+        ${
+          isLong
+            ? `<textarea class="field-textarea" id="field_${key}" placeholder="Enter ${label}..." oninput="liveUpdate()">${values[key] || ""}</textarea>`
+            : `<input class="field-input" id="field_${key}" type="${isUrl ? "url" : "text"}" placeholder="Enter ${label}..." value="${values[key] || ""}" oninput="liveUpdate()" />`
+        }
+      `;
+          container.appendChild(item);
+        });
+
+        document.getElementById("fieldsSection").style.display = "block";
+        liveUpdate();
+      }
+
+      function liveUpdate() {
+        if (!currentTemplate || !placeholders.length) return;
+        let result = currentTemplate;
+        placeholders.forEach((key) => {
+          const el = document.getElementById("field_" + key);
+          const val = el ? el.value : "";
+          result = result.split(`{{${key}}}`).join(val || `{{${key}}}`);
+        });
+        document.getElementById("previewArea").innerHTML = result;
+        document.getElementById("outputCode").textContent = result;
+      }
+
+      function generateOutput() {
+        liveUpdate();
+        showNotif("✓ Code generated! Ready to copy.");
+      }
+
+      function clearFields() {
+        placeholders.forEach((key) => {
+          const el = document.getElementById("field_" + key);
+          if (el) el.value = "";
+        });
+        liveUpdate();
+      }
+
+      function copyCode() {
+        const code = document.getElementById("outputCode").textContent;
+        if (!code || code === "<!-- Generated code will appear here -->") {
+          showNotif("⚠ Nothing to copy yet!", true);
+          return;
+        }
+        navigator.clipboard.writeText(code).then(() => {
+          const btn = document.getElementById("copyBtn");
+          btn.classList.add("copied");
+          btn.innerHTML = "<span>✓</span> Copied!";
+          setTimeout(() => {
+            btn.classList.remove("copied");
+            btn.innerHTML = "<span>⎘</span> Copy Code";
+          }, 2000);
+        });
+      }
+
+      function saveTemplate() {
+        const name = document.getElementById("templateName").value.trim();
+        const code = document.getElementById("templateEditor").value.trim();
+        if (!name) {
+          showNotif("⚠ Enter a template name!", true);
+          return;
+        }
+        if (!code) {
+          showNotif("⚠ Template is empty!", true);
+          return;
+        }
+
+        const existing = templates.findIndex((t) => t.name === name);
+        const tpl = { name, code, date: new Date().toLocaleDateString() };
+        if (existing >= 0) templates[existing] = tpl;
+        else templates.push(tpl);
+
+        localStorage.setItem("mg_templates", JSON.stringify(templates));
+        renderDevTemplateList();
+        showNotif(`✓ "${name}" saved!`);
+        document.getElementById("templateName").value = "";
+      }
+
+      function loadTemplate(name) {
+        const tpl = templates.find((t) => t.name === name);
+        if (!tpl) return;
+        document.getElementById("templateEditor").value = tpl.code;
+        currentTemplate = tpl.code;
+        onTemplateChange();
+        parseTemplate();
+        showNotif(`✓ Loaded "${name}"`);
+      }
+
+      function loadTemplateForContent(name) {
+        const tpl = templates.find((t) => t.name === name);
+        if (!tpl) return;
+        currentTemplate = tpl.code;
+        const matches = [...tpl.code.matchAll(/\{\{(\w+)\}\}/g)];
+        placeholders = [...new Set(matches.map((m) => m[1]))];
+        buildFields();
+        // Highlight selected
+        document.querySelectorAll("#contentTemplateList .template-item").forEach((el) => {
+          el.style.borderColor = el.dataset.name === name ? "var(--accent)" : "var(--border)";
+        });
+        showNotif(`✓ "${name}" loaded — fill in the fields!`);
+      }
+
+      function deleteTemplate(name) {
+        templates = templates.filter((t) => t.name !== name);
+        localStorage.setItem("mg_templates", JSON.stringify(templates));
+        renderDevTemplateList();
+        renderContentTemplateList();
+        showNotif(`Deleted "${name}"`);
+      }
+
+      function renderDevTemplateList() {
+        const list = document.getElementById("templateList");
+        if (!templates.length) {
+          list.innerHTML =
+            '<div class="empty-state" style="padding:20px 0;"><div class="empty-icon" style="font-size:24px;">📂</div>No saved templates yet</div>';
+          return;
+        }
+        list.innerHTML = templates
+          .map(
+            (t) => `
+      <div class="template-item" onclick="loadTemplate('${t.name}')">
+        <span style="font-size:14px;">📄</span>
+        <span class="template-name">${t.name}</span>
+        <span class="template-meta">${t.date}</span>
+        <button class="delete-btn" onclick="event.stopPropagation();deleteTemplate('${t.name}')">✕</button>
+      </div>
+    `,
+          )
+          .join("");
+      }
+
+      function renderContentTemplateList() {
+        const list = document.getElementById("contentTemplateList");
+        const empty = document.getElementById("noTemplates");
+        if (!templates.length) {
+          list.innerHTML = "";
+          empty.style.display = "block";
+          return;
+        }
+        empty.style.display = "none";
+        list.innerHTML = templates
+          .map(
+            (t) => `
+      <div class="template-item" data-name="${t.name}" onclick="loadTemplateForContent('${t.name}')">
+        <span style="font-size:14px;">📄</span>
+        <span class="template-name">${t.name}</span>
+        <span class="template-meta">${t.date}</span>
+      </div>
+    `,
+          )
+          .join("");
+      }
+
+      function loadExample() {
+        const example = `<div class="hero-banner" style="background:{{bg_color}};padding:40px;text-align:center;">
+  <h1 style="font-size:36px;color:{{title_color}};">{{hero_title}}</h1>
+  <p style="font-size:16px;margin:16px 0;">{{hero_description}}</p>
+  <a href="{{button_url}}" style="background:{{button_color}};color:#fff;padding:12px 28px;border-radius:6px;text-decoration:none;display:inline-block;">{{button_text}}</a>
+</div>`;
+        document.getElementById("templateEditor").value = example;
+        document.getElementById("templateName").value = "Hero Banner";
+        onTemplateChange();
+        parseTemplate();
+        showNotif("✓ Example loaded!");
+      }
+
+      function showNotif(msg, isError = false) {
+        const el = document.getElementById("notif");
+        el.textContent = msg;
+        el.style.background = isError ? "var(--accent2)" : "var(--green)";
+        el.style.color = isError ? "#fff" : "#000";
+        el.classList.add("show");
+        setTimeout(() => el.classList.remove("show"), 2500);
+      }
+
+      // Init
+      renderDevTemplateList();
+    </script>
+  </body>
+</html>
